@@ -1,5 +1,20 @@
 {
-    "web1": "offline",
-    "web2": "offline",
-    "db1": "offline"
+    "web1": {
+        "status": "offline",
+        "ip": null,
+        "os": null,
+        "role": null
+    },
+    "web2": {
+        "status": "offline",
+        "ip": null,
+        "os": null,
+        "role": null
+    },
+    "db1": {
+        "status": "offline",
+        "ip": null,
+        "os": null,
+        "role": null
+    }
 }
