@@ -44,14 +44,10 @@ def toggle_status(server_dict, server_name):
 
 # Aktuellen Status aller Server ausgeben
 def list_servers(server_dict):
-    print("\nAktueller Status:")
+    print()
+    print(f"{'Hostname':<15} {'Status':<10} {'IP':<15} {'OS':<10} {'Role':<10}")
     for server, data in server_dict.items():
-        print(f"Hostname: {server}")
-        print(f"  Status: {data['status']}")
-        print(f"  IP: {data['ip']}")
-        print(f"  OS: {data['os']}")
-        print(f"  Role: {data['role']}")
-        print()
+        print(f"{server:<15} {str(data['status']):<10} {str(data['ip']):<15} {str(data['os']):<10} {str(data['role']):<10}")
     print()
 
 
@@ -86,7 +82,12 @@ def add_server(server_dict, server_name):
         print(f"[ERROR] {server_name} existiert bereits.")
         return False
 
-    server_dict[server_name] = "offline"
+    server_dict[server_name] = {
+        "status": "offline",
+        "ip": None,
+        "os": None,
+        "role": None
+    }
     print(f"[OK] {server_name} hinzugefügt -> offline")
     return True
 
@@ -134,6 +135,9 @@ def main():
             if len(parts) != 2:
                 print("[ERROR] Nutzung: toggle <server_name>")
                 continue
+            server_name = parts[1]
+            toggle_status(status, server_name)
+            save_servers_to_json(status, FILENAME)
         elif command == "add":
             if len(parts) != 2:
                 print("[ERROR] Nutzung: add <server_name>")
