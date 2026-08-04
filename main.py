@@ -102,6 +102,7 @@ def remove_server(server_dict, server_name):
 
 # Einstiegspunkt für CLI Tool
 def main():
+    print("\n")
     print("Willkommen zum Server Status Manager!")
     loading_dots(1)
     status = load_servers_from_json(FILENAME)
