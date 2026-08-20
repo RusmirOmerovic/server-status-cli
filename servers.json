@@ -16,5 +16,17 @@
         "ip": null,
         "os": null,
         "role": null
+    },
+    "web3": {
+        "status": "offline",
+        "ip": "192.199.2.1",
+        "os": "windows",
+        "role": "web-server"
+    },
+    "web4": {
+        "status": "offline",
+        "ip": "192.292.19.2",
+        "os": "linux",
+        "role": "server"
     }
 }

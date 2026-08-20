@@ -2,17 +2,21 @@ import json
 import time
 
 
+# ----------------------------------------------------------------------
+# KONSTANTEN / STARTDATEN
+# Definiert die initialen Server sowie den Dateinamen für die Persistenz.
 
-# erstelle Serverliste mit Statusen, ändere einen Status und gebe die Liste als Dictionary aus
-servers = ["web1", "web2", "db1"]
-
-# Datei definieren
+SERVERS = ["web1", "web2", "db1"]
 FILENAME = "servers.json"
 
-# Initialisierungsfunktion, die Server mit Attributen
-# Status, IP, OS und role in verschachtelten Dictionary aufsetzt
+
+# ----------------------------------------------------------------------
+# INITIALISIERUNG
+
+# Erstellt das initiale Server-Dictionary mit den Standardattributen.
 def init_servers(servers):
     server_dict = {}
+
     for server in servers:
         server_dict[server] = {
             "status": "offline",
@@ -20,152 +24,223 @@ def init_servers(servers):
             "os": None,
             "role": None
         }
+
     return server_dict
 
 
-# Erweitere um eine Funktion: Toggle-Status eines Servers, prüfen ob Server existiert, wenn ja 
-# Status wechseln, 
-# wenn nicht Fehlermeldung ausgeben.
-# Toggle-Status ohne Parameter und automatischer Wechsel zwischen "online" und "offline", aktuellen 
-# Status lesen, entscheiden, ausgeben.
-# CLI Tool bauen, um den Status eines Servers zu toggeln, Servernamen als Argument übergeben, 
-# Funktion aufrufen, Ergebnis ausgeben. while Schleife für CLI Tool, Eingabeaufforderung, 
-# Möglichkeit zum Beenden.
-# Beispiel: User gibt Servername ein -> es wird getoggelt -> aktueller Status wird ausgegeben; 
-# bei exit wird beendet.
-def toggle_status(server_dict, server_name):
-    if server_name in server_dict:
-        current_status = server_dict[server_name]["status"]
-        new_status = "online" if current_status == "offline" else "offline"
-        server_dict[server_name]["status"] = new_status
-        print(f"[OK] {server_name} → {new_status}")
-    else:
-        print(f"[ERROR] {server_name} existiert nicht")
+# ----------------------------------------------------------------------
+# FACHLOGIK
 
-# Aktuellen Status aller Server ausgeben
-def list_servers(server_dict):
-    print()
-    print(f"{'Hostname':<15} {'Status':<10} {'IP':<15} {'OS':<10} {'Role':<10}")
-    for server, data in server_dict.items():
-        print(f"{server:<15} {str(data['status']):<10} {str(data['ip']):<15} {str(data['os']):<10} {str(data['role']):<10}")
-    print()
-
-
-# Erstelle eine Funktion, die die Serverliste als JSON-Datei speichert, und eine weitere Funktion, 
-# die die JSON-Datei liest und die Serverliste wiederherstellt.
-def save_servers_to_json(server_dict, filename):
-    with open(filename, "w") as f:
-        json.dump(server_dict, f, indent=4)
-
-def load_servers_from_json(filename):
-    try:
-        with open(filename, "r") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return None
-
-# Ladefunktion die zeitverzögert lädt, um den Ladeprozess zu simulieren, 
-# z.B. durch eine kurze Pause oder durch das Anzeigen von Punkten.
-def loading_dots(duration):
-    end_time = time.time() + duration
-    print("Lädt Daten", end="", flush=True)
-    
-    while time.time() < end_time:
-        print(".", end="", flush=True)
-        time.sleep(0.2)  # Geschwindigkeit der Punkte (alle 1 Sek ein Punkt)
-    
-    print(" Fertig!")
-
-# Server hinzufügen
-def add_server(server_dict, server_name):
+# Fügt einen neuen Server mit IP, Betriebssystem und Rolle hinzu.
+def add_server(server_dict, server_name, ip, os_name, role):
     if server_name in server_dict:
         print(f"[ERROR] {server_name} existiert bereits.")
         return False
 
     server_dict[server_name] = {
         "status": "offline",
-        "ip": None,
-        "os": None,
-        "role": None
+        "ip": ip,
+        "os": os_name,
+        "role": role
     }
+
     print(f"[OK] {server_name} hinzugefügt -> offline")
     return True
 
-# Server entfernen
+
+# Entfernt einen Server aus dem Server-Dictionary.
 def remove_server(server_dict, server_name):
     if server_name not in server_dict:
         print(f"[ERROR] {server_name} existiert nicht.")
         return False
 
     del server_dict[server_name]
+
     print(f"[OK] {server_name} entfernt")
     return True
 
-# Einstiegspunkt für CLI Tool
+
+# Wechselt den Status eines Servers zwischen "online" und "offline".
+def toggle_status(server_dict, server_name):
+    if server_name not in server_dict:
+        print(f"[ERROR] {server_name} existiert nicht")
+        return False
+
+    current_status = server_dict[server_name]["status"]
+    new_status = "online" if current_status == "offline" else "offline"
+
+    server_dict[server_name]["status"] = new_status
+
+    print(f"[OK] {server_name} -> {new_status}")
+    return True
+
+
+# ----------------------------------------------------------------------
+# VALIDIERUNG
+# Wird im nächsten Schritt für IP-Adresse und leere Eingaben ergänzt.
+
+
+# ----------------------------------------------------------------------
+# PERSISTENZ
+
+# Speichert den aktuellen Serverbestand als JSON-Datei.
+def save_servers_to_json(server_dict, filename):
+    with open(filename, "w") as file:
+        json.dump(server_dict, file, indent=4)
+
+
+# Lädt den Serverbestand aus der JSON-Datei.
+# Gibt None zurück, wenn die Datei fehlt oder ungültiges JSON enthält.
+def load_servers_from_json(filename):
+    try:
+        with open(filename, "r") as file:
+            return json.load(file)
+
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
+# ----------------------------------------------------------------------
+# AUSGABE / CLI-HILFSFUNKTIONEN
+
+# Gibt alle Server und ihre Attribute tabellarisch aus.
+def list_servers(server_dict):
+    print()
+    print(
+        f"{'Hostname':<15} "
+        f"{'Status':<10} "
+        f"{'IP':<15} "
+        f"{'OS':<10} "
+        f"{'Role':<10}"
+    )
+    print("-" * 60)
+
+    for server, data in server_dict.items():
+        print(
+            f"{server:<15} "
+            f"{str(data['status']):<10} "
+            f"{str(data['ip']):<15} "
+            f"{str(data['os']):<10} "
+            f"{str(data['role']):<10}"
+        )
+
+    print()
+
+
+# Simuliert beim Programmstart einen kurzen Ladevorgang.
+def loading_dots(duration):
+    end_time = time.time() + duration
+
+    print("Lädt Daten", end="", flush=True)
+
+    while time.time() < end_time:
+        print(".", end="", flush=True)
+        time.sleep(0.2)
+
+    print(" Fertig!")
+
+
+# Zeigt alle verfügbaren CLI-Befehle an.
+def print_help():
+    print("""
+Verfügbare Befehle:
+  list
+  toggle <server_name>
+  add <server_name>
+  remove <server_name>
+  help
+  exit
+""")
+
+
+# ----------------------------------------------------------------------
+# MAIN / CLI
+
+# Startet das Programm, lädt die Daten und verarbeitet Benutzereingaben.
 def main():
-    print("\n")
+    print()
     print("Willkommen zum Server Status Manager!")
+
     loading_dots(1)
+
     status = load_servers_from_json(FILENAME)
 
     if status is None:
-        status = init_servers(servers)
+        status = init_servers(SERVERS)
         save_servers_to_json(status, FILENAME)
         print("Neue Serverliste erstellt.")
     else:
         print("Status aus Datei geladen.")
-    
+
+    print("-" * 60)
+    print("Befehle mit 'help' anzeigen.")
+
     list_servers(status)
 
-#Nutzereingaben und Programmsteuerung
+    # Hauptschleife für die CLI-Befehle.
     while True:
         user_input = input("> ").strip()
 
         if not user_input:
             continue
+
+        # Zerlegt die Eingabe in Befehl und Argumente.
         parts = user_input.split()
         command = parts[0].lower()
 
         if command == "exit":
             print("Beende das Programm.")
             break
+
         elif command == "list":
             list_servers(status)
+
         elif command == "toggle":
             if len(parts) != 2:
                 print("[ERROR] Nutzung: toggle <server_name>")
                 continue
+
             server_name = parts[1]
-            toggle_status(status, server_name)
-            save_servers_to_json(status, FILENAME)
+
+            if toggle_status(status, server_name):
+                save_servers_to_json(status, FILENAME)
+
         elif command == "add":
             if len(parts) != 2:
                 print("[ERROR] Nutzung: add <server_name>")
                 continue
+
             server_name = parts[1]
-            if add_server(status, server_name):
+
+            if server_name in status:
+                print(f"[ERROR] {server_name} existiert bereits.")
+                continue
+
+            # Zusätzliche Serverattribute interaktiv abfragen.
+            ip = input("IP-Adresse: ").strip()
+            os_name = input("Betriebssystem: ").strip()
+            role = input("Rolle: ").strip()
+
+            if add_server(status, server_name, ip, os_name, role):
                 save_servers_to_json(status, FILENAME)
+
         elif command == "remove":
             if len(parts) != 2:
                 print("[ERROR] Nutzung: remove <server_name>")
                 continue
+
             server_name = parts[1]
+
             if remove_server(status, server_name):
                 save_servers_to_json(status, FILENAME)
+
         elif command == "help":
-            print("""
-        Verfügbare Befehle:
-        list
-        toggle <server_name>
-        add <server_name>
-        remove <server_name>
-        help
-        exit
-        """)
+            print_help()
+
         else:
             print("[ERROR] Unbekannter Befehl. Nutze 'help'.")
-        
 
 
+# Führt main() nur aus, wenn die Datei direkt gestartet wird.
 if __name__ == "__main__":
     main()
