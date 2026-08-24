@@ -1,6 +1,6 @@
 import json
 import time
-
+import ipaddress
 
 # ----------------------------------------------------------------------
 # KONSTANTEN / STARTDATEN
@@ -74,15 +74,37 @@ def toggle_status(server_dict, server_name):
     print(f"[OK] {server_name} -> {new_status}")
     return True
 
+# Ändert ein Attribut eines bestehenden Servers.
+def edit_server(server_dict, server_name, field, value):
+    if server_name not in server_dict:
+        return False
+    
+    allowed_fields = ["ip", "os", "role"]
+
+    if field not in allowed_fields:
+        return False
+
+    server_dict[server_name][field] = value
+    return True
 
 # ----------------------------------------------------------------------
 # VALIDIERUNG
-# Wird im nächsten Schritt für IP-Adresse und leere Eingaben ergänzt.
+# Prüft, ob eine gültige IPv4-Adresse eingegeben wurde.
+def validate_ip(ip):
+    try:
+        ipaddress.IPv4Address(ip)
+        return True
+    except ipaddress.AddressValueError:
+        return False
+
+
+# Prüft, ob eine Eingabe nicht leer ist.
+def validate_non_empty(value):
+    return bool(value.strip())
 
 
 # ----------------------------------------------------------------------
 # PERSISTENZ
-
 # Speichert den aktuellen Serverbestand als JSON-Datei.
 def save_servers_to_json(server_dict, filename):
     with open(filename, "w") as file:
@@ -216,13 +238,44 @@ def main():
                 print(f"[ERROR] {server_name} existiert bereits.")
                 continue
 
-            # Zusätzliche Serverattribute interaktiv abfragen.
             ip = input("IP-Adresse: ").strip()
+
+            if not validate_ip(ip):
+                print("[ERROR] Ungültige IP4-Adresse.")
+                continue
+
             os_name = input("Betriebssystem: ").strip()
+
+            if not validate_non_empty(os_name):
+                print("[ERROR] Betriebssystem darf nicht leer sein.")
+                continue
+
             role = input("Rolle: ").strip()
+
+            if not validate_non_empty(role):
+                print("[ERROR] Rolle darf nicht leer sein.")
+                continue
 
             if add_server(status, server_name, ip, os_name, role):
                 save_servers_to_json(status, FILENAME)
+
+        elif command == "edit":
+            if len(parts) != 2:
+                print("[ERROR] Nutzung: edit <server_name>")
+                continue
+            server_name = parts[1]
+
+            if server_name not in status:
+                print(f"[ERROR] {server_name} existiert nicht.")
+                continue
+            field = input("Zu änderndes Attribut (ip/os/role): ").strip().lower()
+            value = input("Neuer Wert: ").strip()
+
+            if edit_server(status, server_name, field, value):
+                save_servers_to_json(status, FILENAME)
+                print(f"[OK] {server_name} -> {field} geändert zu {value}")
+            else:
+                print(f"[ERROR] Ungültiges Attribut: {field}")
 
         elif command == "remove":
             if len(parts) != 2:

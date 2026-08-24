@@ -28,5 +28,11 @@
         "ip": "192.292.19.2",
         "os": "linux",
         "role": "server"
+    },
+    "web5": {
+        "status": "offline",
+        "ip": "192.92.2.1",
+        "os": "linux",
+        "role": "webserver"
     }
 }
