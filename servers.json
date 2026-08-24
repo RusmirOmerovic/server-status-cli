@@ -19,8 +19,8 @@
     },
     "web3": {
         "status": "offline",
-        "ip": "192.199.2.1",
-        "os": "windows",
+        "ip": "192.168.1.59",
+        "os": "Ubuntu Server",
         "role": "web-server"
     },
     "web4": {

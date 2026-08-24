@@ -268,8 +268,19 @@ def main():
             if server_name not in status:
                 print(f"[ERROR] {server_name} existiert nicht.")
                 continue
+
             field = input("Zu änderndes Attribut (ip/os/role): ").strip().lower()
             value = input("Neuer Wert: ").strip()
+
+            if field == "ip":
+                if not validate_ip(value):
+                    print("[ERROR] Ungültige IP4-Adresse.")
+                    continue
+
+            if field in {"os", "role"}:
+                if not validate_non_empty(value):
+                    print(f"[ERROR] {field} darf nicht leer sein.")
+                    continue
 
             if edit_server(status, server_name, field, value):
                 save_servers_to_json(status, FILENAME)
