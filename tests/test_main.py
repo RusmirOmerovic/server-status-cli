@@ -1,4 +1,42 @@
-from main import edit_server
+from main import add_server, edit_server
+
+# Prüft, ob ein vorhandener Server doppelt hinzugefügt wird.
+def test_add_server_rejects_duplicate():
+    servers = {
+        "web1": {
+            "status": "offline",
+            "ip": "192.168.1.10",
+            "os": "Linux",
+            "role": "Webserver"
+        }
+    }
+
+    result = add_server(
+        servers,
+        "web1",
+        "192.168.1.20",
+        "Linux",
+        "Webserver"
+    )
+
+    assert result is False
+    assert servers["web1"]["ip"] == "192.168.1.10" # Vorhandenen Server nicht überschreiben.
+
+
+# Prüft, ob ein neuer Server erfolgreich hinzugefügt wird.
+def test_add_server_success():
+    servers = {}
+
+    result = add_server(
+        servers,
+        "web1",
+        "192.168.1.10",
+        "Linux",
+        "Webserver"
+    )
+
+    assert result is True
+    assert "web1" in servers
 
 
 # Prüft, ob die IP eines vorhandenen Servers erfolgreich geändert wird.
