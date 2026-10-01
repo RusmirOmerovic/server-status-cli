@@ -1,4 +1,50 @@
-from main import add_server, edit_server
+from main import add_server, edit_server, remove_server, toggle_status
+
+# Prüft, ob der Status eines vorhandenen Servers erfolgreich gewechselt wird.
+def test_toggle_status_success():
+    servers = {
+        "web1": {
+            "status": "offline",
+            "ip": "192.168.1.10",
+            "os": "linux",
+            "role": "webserver"
+        }
+    }
+
+    result = toggle_status(servers, "web1")
+
+    assert result is True
+    assert servers["web1"]["status"] == "online"
+
+
+# Prüft, ob ein unbekannter Server beim Toggle sauber abgelehnt wird.
+def test_toggle_status_unknown_server_returns_false():
+    servers = {}
+
+    result = toggle_status(servers, "web99")
+
+    assert result is False
+
+
+# Prüft, ob vorhandener Server erfolgreich entfernt wird.
+def test_remove_server_success():
+    servers = {
+        "web1": {
+            "status": "offline",
+            "ip": "192.168.1.10",
+            "os": "Linux",
+            "role": "Webserver"
+        }
+    }
+
+    result = remove_server(servers, "web1")
+
+    assert result is True
+    assert "web1" not in servers
+
+# Prüft, ob Entfernen eines unbekannten Servers sauber abgelehnt wird.
+def test_remove_server_unknown_server_returns_false():
+    servers = {}
 
 # Prüft, ob ein vorhandener Server doppelt hinzugefügt wird.
 def test_add_server_rejects_duplicate():
