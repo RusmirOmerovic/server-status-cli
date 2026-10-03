@@ -1,7 +1,7 @@
 import json
 import time
 import ipaddress
-
+import logging
 # ----------------------------------------------------------------------
 # KONSTANTEN / STARTDATEN
 # Definiert die initialen Server sowie den Dateinamen für die Persistenz.
@@ -9,6 +9,12 @@ import ipaddress
 SERVERS = ["web1", "web2", "db1"]
 FILENAME = "servers.json"
 
+# Konfiguriert das Logging, um Informationen in eine Datei zu schreiben.
+logging.basicConfig(
+    filename="server_manager.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # ----------------------------------------------------------------------
 # INITIALISIERUNG
@@ -44,6 +50,7 @@ def add_server(server_dict, server_name, ip, os_name, role):
         "role": role
     }
 
+    logging.info(f"Server added: {server_name}")
     print(f"[OK] {server_name} hinzugefügt -> offline")
     return True
 
@@ -56,6 +63,7 @@ def remove_server(server_dict, server_name):
 
     del server_dict[server_name]
 
+    logging.info(f"Server removed: {server_name}")
     print(f"[OK] {server_name} entfernt")
     return True
 
@@ -71,6 +79,7 @@ def toggle_status(server_dict, server_name):
 
     server_dict[server_name]["status"] = new_status
 
+    logging.info(f"Status toggled: {server_name} -> {new_status}")
     print(f"[OK] {server_name} -> {new_status}")
     return True
 
@@ -85,6 +94,9 @@ def edit_server(server_dict, server_name, field, value):
         return False
 
     server_dict[server_name][field] = value
+    
+    logging.info(f"Server edited: {server_name} -> {field} changed to {value}")
+
     return True
 
 # ----------------------------------------------------------------------

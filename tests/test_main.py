@@ -1,4 +1,63 @@
-from main import add_server, edit_server, remove_server, toggle_status
+from main import (
+    add_server, 
+    edit_server, 
+    remove_server, 
+    toggle_status, 
+    save_servers_to_json, 
+    load_servers_from_json,
+)
+
+# Prüft, ob ungültiges JSON kontrolliert behandelt wird.
+def test_load_invalid_json_returns_none(tmp_path):
+    invalid_file = tmp_path / "invalid.json"
+    invalid_file.write_text("{ungültiges json")
+
+    result = load_servers_from_json(invalid_file)
+
+    assert result is None
+
+# Prüft, ob eine nicht vorhandene JSON-Datei kontrolliert behandelt wird.
+def test_load_missing_file_returns_none(tmp_path):
+    missing_file = tmp_path / "does_not_exist.json"
+
+    result = load_servers_from_json(missing_file)
+
+    assert result is None
+
+# Prüft, ob ungültiges JSON kontrolliert behandelt wird.
+def test_load_invalid_json_returns_none(tmp_path):
+    invalid_file = tmp_path / "invalid.json"
+    invalid_file.write_text("{ungültiges json")
+
+    result = load_servers_from_json(invalid_file)
+
+    assert result is None
+
+# Prüft, ob eine nicht vorhandene JSON-Datei kontrolliert behandelt wird.
+def test_load_missing_file_returns_none(tmp_path):
+    missing_file = tmp_path / "does_not_exist.json"
+
+    result = load_servers_from_json(missing_file)
+
+    assert result is None
+
+# Prüft, ob Serverdaten gespeichert und anschließend identisch geladen werden.
+def test_save_and_load_servers(tmp_path):
+    servers = {
+        "web1": {
+            "status": "offline",
+            "ip": "192.168.1.10",
+            "os": "linux",
+            "role": "webserver"
+        }
+    }
+
+    test_file = tmp_path / "servers.json"
+
+    save_servers_to_json(servers, test_file)
+    loaded_servers = load_servers_from_json(test_file)
+
+    assert loaded_servers == servers
 
 # Prüft, ob der Status eines vorhandenen Servers erfolgreich gewechselt wird.
 def test_toggle_status_success():
