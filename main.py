@@ -102,7 +102,7 @@ def edit_server(server_dict, server_name, field, value):
 # ----------------------------------------------------------------------
 # VALIDIERUNG
 # Prüft, ob eine gültige IPv4-Adresse eingegeben wurde.
-def validate_ip(ip):
+def validate_ip(ip: str) -> bool:
     try:
         ipaddress.IPv4Address(ip)
         return True
@@ -111,21 +111,21 @@ def validate_ip(ip):
 
 
 # Prüft, ob eine Eingabe nicht leer ist.
-def validate_non_empty(value):
+def validate_non_empty(value: str) -> bool:
     return bool(value.strip())
 
 
 # ----------------------------------------------------------------------
 # PERSISTENZ
 # Speichert den aktuellen Serverbestand als JSON-Datei.
-def save_servers_to_json(server_dict, filename):
+def save_servers_to_json(server_dict: dict, filename: str):
     with open(filename, "w") as file:
         json.dump(server_dict, file, indent=4)
 
 
 # Lädt den Serverbestand aus der JSON-Datei.
 # Gibt None zurück, wenn die Datei fehlt oder ungültiges JSON enthält.
-def load_servers_from_json(filename):
+def load_servers_from_json(filename: str):
     try:
         with open(filename, "r") as file:
             return json.load(file)
@@ -136,6 +136,25 @@ def load_servers_from_json(filename):
 
 # ----------------------------------------------------------------------
 # AUSGABE / CLI-HILFSFUNKTIONEN
+
+# Zeigt das ASCII-Logo beim Programmstart an.
+def print_banner() -> None:
+    banner = r"""
+   _____                          __  __
+  / ____|                        |  \/  |
+ | (___   ___ _ ____   _____ _ _| \  / | __ _ _ __   __ _  __ _  ___ _ __
+  \___ \ / _ \ '__\ \ / / _ \ '__| |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|
+  ____) |  __/ |   \ V /  __/ |  | |  | | (_| | | | | (_| | (_| |  __/ |
+ |_____/ \___|_|    \_/ \___|_|  |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|
+                                                              __/ |
+                                                             |___/
+
+              +--------------------------------------+
+              |       SERVER STATUS MANAGER          |
+              |     Python CLI | Server Inventory    |
+              +--------------------------------------+
+"""
+    print(banner)
 
 # Gibt alle Server und ihre Attribute tabellarisch aus.
 def list_servers(server_dict):
@@ -162,20 +181,20 @@ def list_servers(server_dict):
 
 
 # Simuliert beim Programmstart einen kurzen Ladevorgang.
-def loading_dots(duration):
+def loading_dots(duration: float) -> None:
     end_time = time.time() + duration
 
     print("Lädt Daten", end="", flush=True)
 
     while time.time() < end_time:
         print(".", end="", flush=True)
-        time.sleep(0.2)
+        time.sleep(1)
 
     print(" Fertig!")
 
 
 # Zeigt alle verfügbaren CLI-Befehle an.
-def print_help():
+def print_help()-> None:
     print("""
 Verfügbare Befehle:
   list
@@ -191,7 +210,8 @@ Verfügbare Befehle:
 # MAIN / CLI
 
 # Startet das Programm, lädt die Daten und verarbeitet Benutzereingaben.
-def main():
+def main() -> None:
+    print_banner()
     print()
     print("Willkommen zum Server Status Manager!")
 
