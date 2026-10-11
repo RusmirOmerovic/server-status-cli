@@ -3,6 +3,6 @@ __pycache__/
 .DS_Store
 .env
 .vscode/
-venv/
+.venv/
 *.log
 servers.json
