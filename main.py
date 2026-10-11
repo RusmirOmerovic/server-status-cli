@@ -2,12 +2,17 @@ import json
 import time
 import ipaddress
 import logging
+from typing import TypeAlias
 # ----------------------------------------------------------------------
 # KONSTANTEN / STARTDATEN
 # Definiert die initialen Server sowie den Dateinamen für die Persistenz.
 
 SERVERS = ["web1", "web2", "db1"]
 FILENAME = "servers.json"
+
+# Type Hints
+ServerData: TypeAlias = dict[str, str | None]
+ServerDict: TypeAlias = dict[str, ServerData]
 
 # Konfiguriert das Logging, um Informationen in eine Datei zu schreiben.
 logging.basicConfig(
@@ -20,8 +25,8 @@ logging.basicConfig(
 # INITIALISIERUNG
 
 # Erstellt das initiale Server-Dictionary mit den Standardattributen.
-def init_servers(servers):
-    server_dict = {}
+def init_servers(servers: list[str]) -> ServerDict:
+    server_dict: ServerDict = {}
 
     for server in servers:
         server_dict[server] = {
@@ -38,7 +43,13 @@ def init_servers(servers):
 # FACHLOGIK
 
 # Fügt einen neuen Server mit IP, Betriebssystem und Rolle hinzu.
-def add_server(server_dict, server_name, ip, os_name, role):
+def add_server(
+        server_dict: ServerDict,
+        server_name: str,
+        ip: str,
+        os_name: str,
+        role: str
+) -> bool:
     if server_name in server_dict:
         print(f"[ERROR] {server_name} existiert bereits.")
         return False
@@ -56,7 +67,10 @@ def add_server(server_dict, server_name, ip, os_name, role):
 
 
 # Entfernt einen Server aus dem Server-Dictionary.
-def remove_server(server_dict, server_name):
+def remove_server(
+        server_dict: ServerDict,
+        server_name: str
+) -> bool:
     if server_name not in server_dict:
         print(f"[ERROR] {server_name} existiert nicht.")
         return False
@@ -69,7 +83,10 @@ def remove_server(server_dict, server_name):
 
 
 # Wechselt den Status eines Servers zwischen "online" und "offline".
-def toggle_status(server_dict, server_name):
+def toggle_status(
+        server_dict: ServerDict,
+        server_name: str
+) -> bool:
     if server_name not in server_dict:
         print(f"[ERROR] {server_name} existiert nicht")
         return False
@@ -84,7 +101,12 @@ def toggle_status(server_dict, server_name):
     return True
 
 # Ändert ein Attribut eines bestehenden Servers.
-def edit_server(server_dict, server_name, field, value):
+def edit_server(
+        server_dict: ServerDict,
+        server_name: str,
+        field: str,
+        value: str
+) -> bool:
     if server_name not in server_dict:
         return False
     
@@ -118,14 +140,14 @@ def validate_non_empty(value: str) -> bool:
 # ----------------------------------------------------------------------
 # PERSISTENZ
 # Speichert den aktuellen Serverbestand als JSON-Datei.
-def save_servers_to_json(server_dict: dict, filename: str):
+def save_servers_to_json(server_dict: ServerDict, filename: str) -> None:
     with open(filename, "w") as file:
         json.dump(server_dict, file, indent=4)
 
 
 # Lädt den Serverbestand aus der JSON-Datei.
 # Gibt None zurück, wenn die Datei fehlt oder ungültiges JSON enthält.
-def load_servers_from_json(filename: str):
+def load_servers_from_json(filename: str) -> ServerDict | None:
     try:
         with open(filename, "r") as file:
             return json.load(file)
@@ -157,24 +179,24 @@ def print_banner() -> None:
     print(banner)
 
 # Gibt alle Server und ihre Attribute tabellarisch aus.
-def list_servers(server_dict):
+def list_servers(server_dict: ServerDict) -> None:
     print()
     print(
         f"{'Hostname':<15} "
         f"{'Status':<10} "
         f"{'IP':<15} "
-        f"{'OS':<10} "
-        f"{'Role':<10}"
+        f"{'OS':<20} "
+        f"{'Role':<20}"
     )
-    print("-" * 60)
+    print("-" * 84)
 
     for server, data in server_dict.items():
         print(
             f"{server:<15} "
             f"{str(data['status']):<10} "
             f"{str(data['ip']):<15} "
-            f"{str(data['os']):<10} "
-            f"{str(data['role']):<10}"
+            f"{str(data['os']):<20} "
+            f"{str(data['role']):<20}"
         )
 
     print()
@@ -194,7 +216,7 @@ def loading_dots(duration: float) -> None:
 
 
 # Zeigt alle verfügbaren CLI-Befehle an.
-def print_help()-> None:
+def print_help() -> None:
     print("""
 Verfügbare Befehle:
   list
