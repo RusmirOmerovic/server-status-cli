@@ -200,6 +200,7 @@ Verfügbare Befehle:
   list
   toggle <server_name>
   add <server_name>
+  edit <server_name>
   remove <server_name>
   help
   exit

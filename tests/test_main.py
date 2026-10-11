@@ -7,22 +7,7 @@ from main import (
     load_servers_from_json,
 )
 
-# Prüft, ob ungültiges JSON kontrolliert behandelt wird.
-def test_load_invalid_json_returns_none(tmp_path):
-    invalid_file = tmp_path / "invalid.json"
-    invalid_file.write_text("{ungültiges json")
 
-    result = load_servers_from_json(invalid_file)
-
-    assert result is None
-
-# Prüft, ob eine nicht vorhandene JSON-Datei kontrolliert behandelt wird.
-def test_load_missing_file_returns_none(tmp_path):
-    missing_file = tmp_path / "does_not_exist.json"
-
-    result = load_servers_from_json(missing_file)
-
-    assert result is None
 
 # Prüft, ob ungültiges JSON kontrolliert behandelt wird.
 def test_load_invalid_json_returns_none(tmp_path):
@@ -104,6 +89,8 @@ def test_remove_server_success():
 # Prüft, ob Entfernen eines unbekannten Servers sauber abgelehnt wird.
 def test_remove_server_unknown_server_returns_false():
     servers = {}
+    result = remove_server(servers, "web99")
+    assert result is False
 
 # Prüft, ob ein vorhandener Server doppelt hinzugefügt wird.
 def test_add_server_rejects_duplicate():
